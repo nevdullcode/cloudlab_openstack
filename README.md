@@ -1,3 +1,8 @@
+CPSC 4770/6770 Team Members:
+  - Chris Austin
+  - Jeff Denton
+  - Nathaniel Hagen
+
 This is an Openstack profile that is based on CloudLab's [default OpenStack profile](https://gitlab.flux.utah.edu/johnsond/openstack-build-ubuntu)
 
 - These are a collection of scripts that install and configuration
