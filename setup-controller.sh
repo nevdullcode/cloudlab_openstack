@@ -4478,8 +4478,15 @@ for i in $(seq 1 ${NUM_HOSTS}); do
     
     port_id=$(openstack port list -f value | grep testport${i} | cut -d' ' -f 1)
 
+    open_stack_instance_name=$(printf "node%03d" ${i})
+
     # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
-    openstack server create --flavor m1.medium --security-group ${security_id} --image OL7 --nic port-id=${port_id} headnode &
+    openstack server create \
+        --flavor m1.medium \
+	--security-group ${security_id} \
+	--image OL7 \
+	--nic port-id=${port_id} \
+	${open_stack_instance_name} &
     LOOP_PIDS+=" $!"
 done
 wait ${LOOP_PIDS}
