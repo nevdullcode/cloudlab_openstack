@@ -4445,30 +4445,45 @@ if [ -n "$DESIGNATE_PASS" -a "${USE_DESIGNATE_AS_RESOLVER}" = "1" ]; then
 fi
 
 # setup fixed ip addresses
+NUM_HOSTS=4
 
 echo "***"
-echo "running codes to setup interface ports with fixed IP addresses"
 
-network_id=`openstack network show -f shell flat-lan-1-net | grep "^id=" | cut -d'"' -f 2`
-subnet_id=`openstack network show -f shell flat-lan-1-net | grep "^subnets=" | cut -d'"' -f 2`
 
-# See https://docs.openstack.org/python-openstackclient/pike/cli/command-objects/port.html
-openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.21 testport1
-openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.22 testport2
-openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.23 testport3
+
 
 # See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
-wget -O /tmp/setup/OL7.vmdk https://clemson.box.com/s/hjfks65lieua2z1xqtvr90dr6fsuvbls
+wget -O /tmp/setup/OL7.vmdk.bz2 https://clemson.box.com/s/s4jja7bcaudcyqd811ukhwwp3nz7ml0r
+which bzip2
+which time
+time bzip2 -dc /tmp/setup/OL7.vmdk.bz2 > /tmp/setup/OL7.vmdk
 glance image-create --name OL7 --disk-format vmdk --visibility public --container-format bare < /tmp/setup/OL7.vmdk
 
-project_id=`openstack project list -f value | grep admin | cut -d' ' -f 1`
-flavor_id=`openstack flavor list -f value | grep m1.small | cut -d' ' -f 1`
-image_id=`openstack image list -f value | grep OL7 | cut -d' ' -f 1`
-security_id=`openstack security group list -f value | grep $project_id | cut -d' ' -f 1`
-port_id=`openstack port list -f value | grep testport3 | cut -d' ' -f 1`
+echo "running codes to setup interface ports with fixed IP addresses"
 
-# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
-openstack server create --flavor m1.medium --security-group $security_id --image OL7 --nic port-id=$port_id headnode
+network_id=$(openstack network show -f shell flat-lan-1-net | grep "^id=" | cut -d'"' -f 2)
+subnet_id=$(openstack network show -f shell flat-lan-1-net | grep "^subnets=" | cut -d'"' -f 2)
+
+project_id=$(openstack project list -f value | grep admin | cut -d' ' -f 1)
+flavor_id=$(openstack flavor list -f value | grep m1.small | cut -d' ' -f 1)
+image_id=$(openstack image list -f value | grep OL7 | cut -d' ' -f 1)
+security_id=$(openstack security group list -f value | grep ${project_id} | cut -d' ' -f 1)
+
+# See https://docs.openstack.org/python-openstackclient/pike/cli/command-objects/port.html
+set -x
+LOOP_PIDS=""
+for i in $(seq 1 ${NUM_HOSTS}); do
+    port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.$((20 + ${i})) testport${i}"
+    ${port_create_cmd}
+    
+    port_id=$(openstack port list -f value | grep testport${i} | cut -d' ' -f 1)
+
+    # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+    openstack server create --flavor m1.medium --security-group ${security_id} --image OL7 --nic port-id=${port_id} headnode &
+    LOOP_PIDS+=" $!"
+done
+wait ${LOOP_PIDS}
+set +x
 
 
 
