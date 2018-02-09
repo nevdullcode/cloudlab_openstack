@@ -4478,7 +4478,7 @@ for i in $(seq 1 ${NUM_HOSTS}); do
     
     port_id=$(openstack port list -f value | grep testport${i} | cut -d' ' -f 1)
 
-    open_stack_instance_name=$(printf "node%03d" ${i})
+    open_stack_instance_name=$(printf "node%03d" $((20 + ${i})))
 
     # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
     openstack server create \
