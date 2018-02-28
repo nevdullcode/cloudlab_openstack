@@ -1,0 +1,52 @@
+#File that explains Nfs stuff
+
+#Server stuff
+yum install nfs-utils
+
+#Edit the /etc/exports file to define the directories that the server will make availible 
+#for the clients to mount
+
+/home ComputeNode_Local-Ip (rw) 
+/software ComputeNode_Local_ip (ro)
+
+#Start the nfs-server service, and configure the service to start following a system reboot
+
+systemctl start nfs-server
+systemctl enable nfs-server
+
+#edit /etc/idmapd.conf and edit the definition for the Domain parameter to specify the DNS domain name of the server
+
+vi /etc/idmapd.conf
+
+# configure the firewall
+
+#firewall-cmd --zone=zone --add-service=nfs
+#firewall-cmd --permanent --zone=zone --add-service=nfs
+
+#Use the showmount -e command to display a list of the exported file systems
+
+showmount -e 
+
+# NFS Client stuff
+
+yum install nfs-utils
+
+#Use showmount -e to discover what file systems an NFS server exports
+# Example: showmount -e host01.mydom.com
+
+showmount -e headNode.cpsc.edu
+
+#Use the mount command to mount an exported NFS file system on an available mount point
+
+mount -t nfs -o rw HeadNode.cpsc.edu:/home /home
+mount -t nfs -o ro HeadNode.cpsc.edu:/software /software
+
+#To configure the system to mount an NFS file system at boot time, add an entry for the file system to /etc/fstab
+#Example: host01.mydoc.com:/usr/local/apps      /apps      nfs      ro,nosuid  0 0
+
+
+
+
+
+
+
