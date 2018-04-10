@@ -4490,12 +4490,12 @@ openstack server create \
 --image OL7 \
 --nic port-id=${port_id} \
 ${open_stack_instance_name} &
-PIDS+=" $!"
+PIDS="${PIDS} $!"
 
 # Compute Nodes
 for i in $(seq 1 ${NUM_COMPUTE_HOSTS}); do
-    ((ip_suffix+=1))
-    ((testport+=1))
+    ((ip_suffix=ip_suffix+1))
+    ((testport=testport+1))
     port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.${ip_suffix} testport${testport}"
     ${port_create_cmd}
 
@@ -4510,13 +4510,13 @@ for i in $(seq 1 ${NUM_COMPUTE_HOSTS}); do
 	--image OL7 \
 	--nic port-id=${port_id} \
 	${open_stack_instance_name} &
-    PIDS+=" $!"
+    PIDS="${PIDS} $!"
 done
 
 # Storage (OrangeFS) Nodes
 for i in $(seq 1 ${NUM_STORAGE_HOSTS}); do
-    ((ip_suffix+=1))
-    ((testport+=1))
+    ((ip_suffix=ip_suffix+1))
+    ((testport=testport+1))
     port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.${ip_suffix} testport${testport}"
     ${port_create_cmd}
 
@@ -4531,7 +4531,7 @@ for i in $(seq 1 ${NUM_STORAGE_HOSTS}); do
 	--image OL7 \
 	--nic port-id=${port_id} \
 	${open_stack_instance_name} &
-    PIDS+=" $!"
+    PIDS="${PIDS} $!"
 done
 
 wait ${PIDS}
