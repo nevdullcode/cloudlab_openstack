@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 ##
 ## Setup the OpenStack controller node.
@@ -4494,8 +4494,8 @@ PIDS="${PIDS} $!"
 
 # Compute Nodes
 for i in $(seq 1 ${NUM_COMPUTE_HOSTS}); do
-    ip_suffix=$((${ip_suffix}+1))
-    testport=$((${testport}+1))
+    ((ip_suffix++))
+    ((testport++))
     port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.${ip_suffix} testport${testport}"
     ${port_create_cmd}
 
@@ -4515,8 +4515,8 @@ done
 
 # Storage (OrangeFS) Nodes
 for i in $(seq 1 ${NUM_STORAGE_HOSTS}); do
-    ip_suffix=$((${ip_suffix}+1))
-    testport=$((${testport}+1))
+    ((ip_suffix++))
+    ((testport++))
     port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.${ip_suffix} testport${testport}"
     ${port_create_cmd}
 
