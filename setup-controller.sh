@@ -4470,8 +4470,8 @@ security_id=$(openstack security group list -f value | grep ${project_id} | cut 
 set -x
 PIDS=""
 
-NUM_COMPUTE_HOSTS=3
-NUM_STORAGE_HOSTS=2
+#NUM_COMPUTE_HOSTS=3
+#NUM_STORAGE_HOSTS=2
 
 # Head node
 ip_suffix=21
@@ -4493,46 +4493,93 @@ ${open_stack_instance_name} &
 PIDS="${PIDS} $!"
 
 # Compute Nodes
-for i in $(seq 1 ${NUM_COMPUTE_HOSTS}); do
-    ip_suffix=$(($ip_suffix+1))
-    testport=$(($testport+1))
-    port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.${ip_suffix} testport${testport}"
-    ${port_create_cmd}
+# node001
+port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.22 testport2"
+${port_create_cmd}
 
-    port_id=$(openstack port list -f value | grep testport${testport} | cut -d' ' -f 1)
+port_id=$(openstack port list -f value | grep testport2 | cut -d' ' -f 1)
 
-    open_stack_instance_name=$(printf "node%03d" ${i})
+open_stack_instance_name=node001
 
-    # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
-    openstack server create \
-        --flavor m1.medium \
-	--security-group ${security_id} \
-	--image OL7 \
-	--nic port-id=${port_id} \
-	${open_stack_instance_name} &
-    PIDS="${PIDS} $!"
-done
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create \
+    --flavor m1.medium \
+    --security-group ${security_id} \
+    --image OL7 \
+    --nic port-id=${port_id} \
+    ${open_stack_instance_name} &
+PIDS="${PIDS} $!"
+
+#node002
+port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.23 testport3"
+${port_create_cmd}
+
+port_id=$(openstack port list -f value | grep testport3 | cut -d' ' -f 1)
+
+open_stack_instance_name=node002
+
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create \
+    --flavor m1.medium \
+    --security-group ${security_id} \
+    --image OL7 \
+    --nic port-id=${port_id} \
+    ${open_stack_instance_name} &
+PIDS="${PIDS} $!"
+
+#node003
+port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.24 testport4"
+${port_create_cmd}
+
+port_id=$(openstack port list -f value | grep testport4 | cut -d' ' -f 1)
+
+open_stack_instance_name=node003
+
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create \
+    --flavor m1.medium \
+    --security-group ${security_id} \
+    --image OL7 \
+    --nic port-id=${port_id} \
+    ${open_stack_instance_name} &
+PIDS="${PIDS} $!"
+
 
 # Storage (OrangeFS) Nodes
-for i in $(seq 1 ${NUM_STORAGE_HOSTS}); do
-    ip_suffix=$(($ip_suffix+1))
-    testport=$(($testport+1))
-    port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.${ip_suffix} testport${testport}"
-    ${port_create_cmd}
+#ofs001
+port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.25 testport5"
+${port_create_cmd}
 
-    port_id=$(openstack port list -f value | grep testport${testport} | cut -d' ' -f 1)
+port_id=$(openstack port list -f value | grep testport5 | cut -d' ' -f 1)
 
-    open_stack_instance_name=$(printf "ofs%03d" ${i})
+open_stack_instance_name=ofs001
 
-    # See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
-    openstack server create \
-        --flavor m1.medium \
-	--security-group ${security_id} \
-	--image OL7 \
-	--nic port-id=${port_id} \
-	${open_stack_instance_name} &
-    PIDS="${PIDS} $!"
-done
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create \
+    --flavor m1.medium \
+    --security-group ${security_id} \
+    --image OL7 \
+    --nic port-id=${port_id} \
+    ${open_stack_instance_name} &
+PIDS="${PIDS} $!"
+
+#ofs002
+port_create_cmd="openstack port create --network ${network_id} --fixed-ip subnet=${subnet_id},ip-address=10.11.10.26 testport6"
+${port_create_cmd}
+
+port_id=$(openstack port list -f value | grep testport6 | cut -d' ' -f 1)
+
+open_stack_instance_name=ofs002
+
+# See https://docs.openstack.org/mitaka/install-guide-ubuntu/launch-instance-selfservice.html
+openstack server create \
+    --flavor m1.medium \
+    --security-group ${security_id} \
+    --image OL7 \
+    --nic port-id=${port_id} \
+    ${open_stack_instance_name} &
+PIDS="${PIDS} $!"
+
 
 wait ${PIDS}
 set +x
