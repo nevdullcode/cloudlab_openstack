@@ -4450,7 +4450,7 @@ fi
 echo "***"
 
 # See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
-wget -O /tmp/setup/OL7.vmdk.bz2 https://clemson.box.com/shared/static/lbypuf9p8tweekp016ohp1x8sd19avln.bz2
+wget -O /tmp/setup/OL7.vmdk.bz2 https://clemson.box.com/shared/static/y8jd7was0jw1432dongdnkwmqt8uwqrg.bz2
 which bzip2
 which time
 time bzip2 -dc /tmp/setup/OL7.vmdk.bz2 > /tmp/setup/OL7.vmdk
