@@ -4450,11 +4450,12 @@ fi
 echo "***"
 
 # See https://docs.openstack.org/project-install-guide/baremetal/draft/configure-glance-images.html
-wget -O /tmp/setup/OL7.vmdk.bz2 https://clemson.box.com/shared/static/y8jd7was0jw1432dongdnkwmqt8uwqrg.bz2
+wget -O /dev/shm/OL7.vmdk.bz2 https://clemson.box.com/shared/static/y8jd7was0jw1432dongdnkwmqt8uwqrg.bz2
 which bzip2
 which time
-time bzip2 -dc /tmp/setup/OL7.vmdk.bz2 > /tmp/setup/OL7.vmdk
-glance image-create --name OL7 --disk-format vmdk --visibility public --container-format bare < /tmp/setup/OL7.vmdk
+time bzip2 -dc /dev/shm/OL7.vmdk.bz2 > /dev/shm/OL7.vmdk
+glance image-create --name OL7 --disk-format vmdk --visibility public --container-format bare < /dev/shm/OL7.vmdk
+rm /dev/shm/OL7.vmdk*
 
 echo "running codes to setup interface ports with fixed IP addresses"
 
